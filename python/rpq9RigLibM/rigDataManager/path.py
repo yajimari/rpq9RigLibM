@@ -1,7 +1,6 @@
 # Copyright 2026 Ryoya Yajima
 # SPDX-License-Identifier: Apache-2.0
 
-import os
 from pathlib import Path
 import dataclasses
 
@@ -51,9 +50,10 @@ class DataPath:
 
     def listCategory(self) -> list[str]:
         res = []
-        for child in self.getRootDir().iterdir():
-            if child.is_dir() and not child.name.startswith('_'):
-                res.append(child.name)
+        if self.getRootDir().is_dir():
+            for child in self.getRootDir().iterdir():
+                if child.is_dir() and not child.name.startswith('_'):
+                    res.append(child.name)
         return res
 
     #--- name
@@ -70,9 +70,10 @@ class DataPath:
 
     def listName(self, token:AssetToken) -> list[str]:
         res = []
-        for child in self.getCategoryDir(token).iterdir():
-            if child.is_dir() and not child.name.startswith('_'):
-                res.append(child.name)
+        if self.getCategoryDir(token).is_dir():
+            for child in self.getCategoryDir(token).iterdir():
+                if child.is_dir() and not child.name.startswith('_'):
+                    res.append(child.name)
         return res
 
     #--- target
@@ -86,9 +87,10 @@ class DataPath:
 
     def listTarget(self, token:AssetToken) -> list[str]:
         res = []
-        for child in self.getNameDir(token).iterdir():
-            if child.is_dir() and not child.name.startswith('_'):
-                res.append(child.name)
+        if self.getNameDir(token).is_dir():
+            for child in self.getNameDir(token).iterdir():
+                if child.is_dir() and not child.name.startswith('_'):
+                    res.append(child.name)
         return res
 
     #---

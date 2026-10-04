@@ -8,6 +8,9 @@ from pathlib import Path
 import shutil
 from abc import ABC, abstractmethod
 from typing import Type
+from collections.abc import Callable
+from PySide6.QtWidgets import QMenu
+from PySide6.QtGui import QAction
 
 import maya.api.OpenMaya as om2
 
@@ -17,10 +20,9 @@ from ..moduleLoader import dynamicLoadModule
 
 BUILT_IN_MODULE_PATH = Path(__file__).parent.joinpath('builtInIO').as_posix()
 
-DATA_IO_MODULE_ENV_KEY = 'RPQ9_RIG_DATA_IO_MODULE_PATH'
+DATA_IO_MODULE_ENV_KEY = 'RPQ9_RIGLIBM_DATA_IO_MODULE_PATH'
 
 MODULE_EXTENSIONS = {'.py', '.pyd', '.so'}
-
 
 _classesCache = {'built_in': {}, 'custom': {}}
 
@@ -32,9 +34,17 @@ class DataIOBase(ABC):
     def color(self) -> list[int]:
         return[30, 30, 30]
 
-    @abstractmethod
-    def existsDataList(self, dataPath:DataPath, assetToken:AssetToken) -> list[str]:
-        pass
+    def isHideGUI(self) -> bool:
+        return False
+
+    def customImportButtonContextMenu(self, menu:QMenu) -> list[tuple[QAction, Callable[[QAction, DataPath, AssetToken], None]]]:
+        return []
+
+    def customExportButtonContextMenu(self, menu:QMenu) -> list[tuple[QAction, Callable[[QAction, DataPath, AssetToken], None]]]:
+        return []
+
+    def getListOfExistingData(self, dataPath:DataPath, assetToken:AssetToken) -> list[str]:
+        raise NotImplementedError()
 
     @abstractmethod
     def exportData(self, dataPath:DataPath, assetToken:AssetToken, *args, **kwargs) -> None:
@@ -108,7 +118,6 @@ class DataIOBase(ABC):
         if len(name.encode('utf-8')) > 255:
             return False
         return True
-
 
 
 

@@ -1,7 +1,6 @@
 # Copyright 2026 Ryoya Yajima
 # SPDX-License-Identifier: Apache-2.0
 
-from typing import Any
 import maya.cmds as cmds
 
 

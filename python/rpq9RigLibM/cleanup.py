@@ -2,9 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import maya.cmds as cmds
-import maya.mel as mel
 import maya.api.OpenMaya as om2
-
 
 
 def deleteMayaNodeEditorSavedTabsInfo():
@@ -15,7 +13,6 @@ def deleteMayaNodeEditorSavedTabsInfo():
             for i in range(0, len(connected_attr), 2):
                 cmds.disconnectAttr(connected_attr[i+1], connected_attr[i])
         cmds.delete('MayaNodeEditorSavedTabsInfo')
-
 
 
 def cleanupSkinClusterName():
@@ -167,7 +164,6 @@ def hideDGNodeFromChannelBox(hideTypes:set[str]=DEFAULT_HIDE_DEPENDENCY_NODES) -
             cmds.setAttr(f'{node}.ihi', 0)
 
 
-
 def removeUnusedIntermediateObject():
     shapes = cmds.ls(type='shape')
     for shape in shapes:
@@ -180,11 +176,8 @@ def removeUnusedIntermediateObject():
             cmds.delete(shape)
 
 
-
-
 def removeUnknownNodesAndPlugins():
     unknownNodes = cmds.ls(type='unknown') or []
-
     for node in unknownNodes:
         try:
             cmds.delete(node)
