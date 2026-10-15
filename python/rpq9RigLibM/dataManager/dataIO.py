@@ -69,8 +69,8 @@ class DataIOBase(ABC):
         regex = re.compile(rf"^{re.escape(stem)}\.bk(\d{{4}})(?:\..+)?$")
 
         numbers = []
-        for path in backupDir.glob(pattern):
-            match = regex.match(path.name)
+        for backupPath in backupDir.glob(pattern):
+            match = regex.match(backupPath.name)
             if match:
                 numbers.append(int(match.group(1)))
 
