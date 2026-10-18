@@ -90,7 +90,6 @@ class Attribute:
         cmds.setAttr(self.partialPathName(True, True, True, False, True), *args, **kwargs)
 
 
-
     def inputEqual(self, other:'Attribute') -> bool:
         if not self.attribute() == other.attribute():
             #return False
@@ -139,6 +138,16 @@ class Attribute:
                     continue
                 cmds.connectAttr(otherAttr, output.partialName(includeNodeName=True), f=True)
 
+        if self.isArray:
+            for i in self.getExistingArrayAttributeIndices():
+                self.elementByLogicalIndex(i).swapOutput(other.elementByLogicalIndex(i))
+
+        elif self.isCompound:
+            for i in range(self.numChildren()):
+                child = self.child(i)
+                child.swapOutput(other.child(child.attribute()))
+
+
     def partialPathName(self, includeNonMandatoryIndices=False, includeInstancedIndices=False, useAlias=False, useFullAttributePath=False, useLongNames=False):
         mobj = self.node()
         if mobj.hasFn(om2.MFn.kDagNode):
@@ -146,7 +155,7 @@ class Attribute:
             return f'{mfn.partialPathName()}.{self.partialName(False, includeNonMandatoryIndices, includeInstancedIndices, useAlias, useFullAttributePath, useLongNames)}'
         else:
             return self.partialName(True, includeNonMandatoryIndices, includeInstancedIndices, useAlias, useFullAttributePath, useLongNames)
-	
+
 
     #-- simple wrapper
     def attribute(self):

@@ -29,14 +29,14 @@ class TangentType(StrEnum):
 class DrivenKeyData:
     driverValue: Real = 0.0
     drivenValue: Real = 0.0
-    inTangetType: TangentType = TangentType.AUTO
-    outTangetType: TangentType = TangentType.AUTO
+    inTangentType: TangentType = TangentType.AUTO
+    outTangentType: TangentType = TangentType.AUTO
 
     def getCmdsArguments(self) -> dict[str, Any]:
         return {'value': self.drivenValue,
                 'driverValue': self.driverValue,
-                'inTangetType': str(self.inTangetType),
-                'outTangetType': str(self.outTangetType)}
+                'inTangentType': str(self.inTangentType),
+                'outTangentType': str(self.outTangentType)}
 
 
 def setDrivenKeyframes(driver:str, driven:str, drivenKeyData:list[DrivenKeyData]) -> None:
