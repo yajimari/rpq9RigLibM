@@ -10,11 +10,16 @@ from PySide6.QtCore import (
 
 from PySide6.QtWidgets import (
     QWidget,
+    QMessageBox,
     QLayout,
     QSizePolicy
 )
 
+from shiboken6 import wrapInstance
+
+import maya.OpenMayaUI as omui
 from maya.app.general.mayaMixin import MayaQWidgetDockableMixin
+
 
 class BaseWidget(MayaQWidgetDockableMixin, QWidget):
     _instance = None
@@ -148,3 +153,19 @@ class FlowLayout(QLayout):
             lineHeight = max(lineHeight, itemSize.height())
 
         return y + lineHeight - rect.y() + bottom
+
+
+def getMayaMainWindow() -> QWidget:
+    return wrapInstance(int(omui.MQtUtil.mainWindow()), QWidget)
+
+
+def showSimpleQuestionDialog(title:str, text:str) -> bool:
+    result = QMessageBox.question(
+                getMayaMainWindow(),
+                title,
+                text,
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.No
+            )
+
+    return result == QMessageBox.StandardButton.Yes

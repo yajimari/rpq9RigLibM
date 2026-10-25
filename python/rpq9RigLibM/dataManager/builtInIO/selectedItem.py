@@ -30,7 +30,7 @@ class DataIO(DataIOBase):
                 res.append(p.as_posix())
         return res
 
-    def exportData(self, dataPath:DataPath, assetToken:AssetToken, itemName:str='', objs:list[str]|None=None, *args, **kwargs) -> None:
+    def exportData(self, dataPath:DataPath, assetToken:AssetToken, itemName:str='', objs:list[str]|None=None, allowDialog=True, *args, **kwargs) -> None:
         if not itemName:
             result = cmds.promptDialog(
                         title='Scene File Name',
@@ -54,6 +54,9 @@ class DataIO(DataIOBase):
             cmds.select(objs)
 
         savePath = self.getDataRootDir(dataPath, assetToken) / f'{itemName}{DataIO.FILE_EXT}'
+        if savePath.exists() and allowDialog:
+            if not showSimpleQuestionDialog('Confirm File Overwrite', f'A file with the same name already exists.\n  {savePath.as_posix()}\nDo you want to overwrite the existing file?'):
+                return
         os.makedirs(savePath.parent, exist_ok=True)
         self.backup(savePath)
         cmds.file(savePath.as_posix(), exportSelected=True, type='mayaBinary', force=True, options='v=0;')

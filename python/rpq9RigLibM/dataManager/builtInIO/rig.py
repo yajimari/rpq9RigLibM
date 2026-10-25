@@ -8,6 +8,7 @@ import maya.cmds as cmds
 import maya.api.OpenMaya as om2
 
 from rpq9RigLibM.dataManager import DataIOBase, DataPath, AssetToken
+from rpq9RigLibM.ui import showSimpleQuestionDialog
 
 
 class DataIO(DataIOBase):
@@ -20,7 +21,7 @@ class DataIO(DataIOBase):
     def getListOfExistingData(self, dataPath:DataPath, assetToken:AssetToken) -> list[str]:
         return [self.getFilePath(dataPath, assetToken).as_posix()] if self.getFilePath(dataPath, assetToken).is_file() else []
 
-    def exportData(self, dataPath:DataPath, assetToken:AssetToken, objs:list[str]|None=None, *args, **kwargs) -> None:
+    def exportData(self, dataPath:DataPath, assetToken:AssetToken, objs:list[str]|None=None, allowDialog=True, *args, **kwargs) -> None:
         kwargs = {
             'force': True,
             'options': 'v=0;',
@@ -37,6 +38,9 @@ class DataIO(DataIOBase):
             kwargs['exportAll'] = True
 
         savePath = self.getFilePath(dataPath, assetToken)
+        if savePath.exists() and allowDialog:
+            if not showSimpleQuestionDialog('Confirm File Overwrite', f'A file with the same name already exists.\n  {savePath.as_posix()}\nDo you want to overwrite the existing file?'):
+                return
         os.makedirs(savePath.parent, exist_ok=True)
         self.backup(savePath)
 
