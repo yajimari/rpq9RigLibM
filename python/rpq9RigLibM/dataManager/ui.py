@@ -415,6 +415,12 @@ class MainUI(BaseWidget):
         return AssetToken(currentCategory, currentName, currentTarget)
 
 
+    def setAssetToken(self, assetToken:AssetToken):
+        self.categoryCombo.setCurrentText(assetToken.category)
+        self.nameCombo.setCurrentText(assetToken.name)
+        self.targetCombo.setCurrentText(assetToken.target)
+
+
     def showNewAssetDialog(self):
         dialog = NewAssetDialog(parent=self)
         dialogResult = dialog.exec()
@@ -433,6 +439,7 @@ class MainUI(BaseWidget):
 
         asset_path = self.dataPath.createAssetDirectory(assetToken)
         self.updateAssets()
+        self.setAssetToken(assetToken)
         QMessageBox.information(self, 'Info', f'Created asset dir: {assetToken.category} / {assetToken.name} / {assetToken.target}')
 
 

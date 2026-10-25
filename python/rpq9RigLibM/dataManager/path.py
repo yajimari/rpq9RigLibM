@@ -54,7 +54,7 @@ class DataPath:
             for child in self.getRootDir().iterdir():
                 if child.is_dir() and not child.name.startswith('_'):
                     res.append(child.name)
-        return res
+        return sorted(res)
 
     #--- name
     def getNameDir(self, token:AssetToken) -> Path:
@@ -74,7 +74,7 @@ class DataPath:
             for child in self.getCategoryDir(token).iterdir():
                 if child.is_dir() and not child.name.startswith('_'):
                     res.append(child.name)
-        return res
+        return sorted(res)
 
     #--- target
     def getTargetDir(self, token:AssetToken) -> Path:
@@ -91,7 +91,7 @@ class DataPath:
             for child in self.getNameDir(token).iterdir():
                 if child.is_dir() and not child.name.startswith('_'):
                     res.append(child.name)
-        return res
+        return sorted(res)
 
     #---
     def getAssetTokenFromPath(self, path:str|Path) -> AssetToken:
