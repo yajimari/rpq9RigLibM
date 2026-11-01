@@ -32,9 +32,8 @@ from PySide6.QtGui import (
 )
 
 import maya.api.OpenMaya as om2
-from maya.internal.common.utils.ui import makeUndoable
 
-from ..ui import BaseWidget, STRETCH_SIZE_POLICY, FlowLayout
+from ..ui import BaseWidget, STRETCH_SIZE_POLICY, FlowLayout, oneUndoWithDeferredDisplayError
 from .dataIO import getDataIOClasses
 from .path import DataPath, AssetToken
 
@@ -344,8 +343,8 @@ class MainUI(BaseWidget):
         exportButton.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         exportButton.customContextMenuRequested.connect(lambda point, button=exportButton, ioIns=ioIns, **kwargs: self.showExportButtonContextMenu(pos=point, button=button, ioIns=ioIns))
 
-        importButton.clicked.connect(lambda *args: makeUndoable(lambda *args: ioIns.importData(self.dataPath, self.getAssetToken()))())
-        exportButton.clicked.connect(lambda *args: makeUndoable(lambda *args: ioIns.exportData(self.dataPath, self.getAssetToken()))())
+        importButton.clicked.connect(lambda *args: oneUndoWithDeferredDisplayError(lambda *args: ioIns.importData(self.dataPath, self.getAssetToken()))())
+        exportButton.clicked.connect(lambda *args: oneUndoWithDeferredDisplayError(lambda *args: ioIns.exportData(self.dataPath, self.getAssetToken()))())
 
         buttonLayout.addWidget(importButton)
         buttonLayout.addWidget(exportButton)

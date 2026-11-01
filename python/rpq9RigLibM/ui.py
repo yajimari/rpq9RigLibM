@@ -19,6 +19,7 @@ from shiboken6 import wrapInstance
 
 import maya.OpenMayaUI as omui
 from maya.app.general.mayaMixin import MayaQWidgetDockableMixin
+from maya.internal.common.utils.ui import UndoContextManager
 
 
 class BaseWidget(MayaQWidgetDockableMixin, QWidget):
@@ -169,3 +170,14 @@ def showSimpleQuestionDialog(title:str, text:str) -> bool:
             )
 
     return result == QMessageBox.StandardButton.Yes
+
+
+def oneUndoWithDeferredDisplayError(func):
+    def wrapper(*args, **kwargs):
+        with UndoContextManager() as undomgr:
+            try:
+                return func(*args, **kwargs)
+            except Exception as e:
+                cmds.evalDeferred(f'import maya.api.OpenMata as om2;om2.MGlobal.displayError("{str(e)}")', evaluateNext=True)
+                raise
+    return wrapper
