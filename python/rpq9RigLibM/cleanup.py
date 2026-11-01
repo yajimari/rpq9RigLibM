@@ -1,9 +1,9 @@
 # Copyright 2026 Ryoya Yajima
 # SPDX-License-Identifier: Apache-2.0
-
 import maya.cmds as cmds
 import maya.api.OpenMaya as om2
 
+from . import node
 
 def deleteMayaNodeEditorSavedTabsInfo():
     node = cmds.ls('MayaNodeEditorSavedTabsInfo')
@@ -23,131 +23,7 @@ def cleanupSkinClusterName():
         cmds.rename(node, f'{bindObject}_skinCluster')
 
 
-DEFAULT_HIDE_DEPENDENCY_NODES = {
-                    'sum',
-                    'subtract',
-                    'multiply',
-                    'divide',
-                    'addDoubleLinear',
-                    'multDoubleLinear',
-                    'addDL',
-                    'plusMinusAverage',
-
-                    'addMatrix',
-                    'aiFloatToMatrix',
-                    'aiMatrixInterpolate',
-                    'aiMatrixMultiplyVector',
-                    'aiMatrixTransform',
-                    'aimMatrix',
-                    'axisFromMatrix',
-                    'blendMatrix',
-                    'columnFromMatrix',
-                    'composeMatrix',
-                    'decomposeMatrix',
-                    'fourByFourMatrix',
-                    'holdMatrix',
-                    'inverseMatrix',
-                    'multMatrix',
-                    'parentMatrix',
-                    'passMatrix',
-                    'pickMatrix',
-                    'rotationFromMatrix',
-                    'rowFromMatrix',
-                    'scaleFromMatrix',
-                    'translationFromMatrix',
-                    'transposeMatrix',
-                    'wtAddMatrix',
-                    'determinant',
-
-                    'quatAdd',
-                    'quatConjugate',
-                    'quatInvert',
-                    'quatNegate',
-                    'quatNormalize',
-                    'quatProd',
-                    'quatSlerp',
-                    'quatSub',
-                    'quatToAxisAngle',
-                    'quatToEuler',
-                    'axisAngleToQuat',
-                    'eulerToQuat',
-
-                    'sin',
-                    'cos',
-                    'tan',
-                    'asin',
-                    'acos',
-                    'atan',
-                    'atan2',
-
-                    'pointMatrixMult',
-                    'multiplyPointByMatrix',
-                    'multiplyVectorByMatrix',
-                    'dotProduct',
-                    'crossProduct',
-                    'distanceBetween',
-                    'angleBetween',
-                    'rotateVector'
-                    'aimConstraint',
-                    'dynamicConstraint',
-                    'geometryConstraint',
-                    'hairConstraint',
-                    'normalConstraint',
-                    'oldGeometryConstraint',
-                    'oldNormalConstraint',
-                    'oldTangentConstraint',
-                    'orientConstraint',
-                    'parentConstraint',
-                    'pointConstraint',
-                    'pointOnPolyConstraint',
-                    'poleVectorConstraint',
-                    'rigidConstraint',
-                    'scaleConstraint',
-                    'symmetryConstraint',
-                    'tangentConstraint',
-
-                    'nurbsCurve',
-                    'nurbsSurface',
-                    'absolute',
-                    'log',
-                    'pi',
-                    'max',
-                    'power',
-                    'and',
-                    'equal',
-                    'min',
-                    'round',
-                    'floor',
-                    'modulo',
-                    'greaterThan',
-                    'inverseLerp',
-                    'negate',
-                    'smoothStep',
-                    'average',
-                    'length',
-                    'normalize',
-                    'ceil',
-                    'lerp',
-                    'not',
-                    'truncate',
-                    'clampRange',
-                    'lessThan',
-                    'or',
-                    'pairBlend',
-                    'controller',
-                    'curveInfo',
-                    'choice',
-                    'determinantDL',
-                    'dotProductDL',
-                    'divideDL',
-                    'acosDL',
-                    'asinDL',
-                    'atanDL',
-                    'atan2DL'
-    }
-
-
-def hideDGNodeFromChannelBox(hideTypes:set[str]=DEFAULT_HIDE_DEPENDENCY_NODES) -> None:
+def hideDGNodeFromChannelBox(hideTypes:set[str]=node.listDGNodeTypes()) -> None:
     '''
     Overview:
         Hides nodes of the specified type from the Channel Box display.

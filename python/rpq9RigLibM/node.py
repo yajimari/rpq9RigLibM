@@ -1,10 +1,12 @@
 # Copyright 2026 Ryoya Yajima
 # SPDX-License-Identifier: Apache-2.0
+from pathlib import Path
+import csv
 
 import maya.cmds as cmds
 
 
-def getNodesFromObjectSet(objectSet:str, nodeTypes:set[str]) -> set[str]:
+def getNodesFromObjectSetRecursive(objectSet:str, nodeTypes:set[str]) -> set[str]:
     '''
     Overview:
         Retrieves all nodes of the specified type within the objectSet.
@@ -21,7 +23,13 @@ def getNodesFromObjectSet(objectSet:str, nodeTypes:set[str]) -> set[str]:
     for node in setObjs:
         nodeType = cmds.nodeType(node)
         if nodeType == 'objectSets':
-            res |= getNodesFromObjectSet(node, nodeTypes)
+            res |= getNodesFromObjectSetRecursive(node, nodeTypes)
         if nodeType in nodeTypes:
             res.add(node)
     return res
+
+
+def listDGNodeTypes() -> set[str]:
+    allTypes = set(cmds.allNodeTypes())
+    dagTypes = set(cmds.nodeType('dagNode', derived=True, isTypeName=True))
+    return allTypes - dagTypes
