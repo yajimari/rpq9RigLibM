@@ -95,7 +95,7 @@ class DataPath:
 
     #---
     def getAssetTokenFromPath(self, path:str|Path) -> AssetToken:
-        pathObj = Path(path)
+        pathObj = Path(path).resolve()
         relativePathObj = pathObj.relative_to(self.getRootDir())
 
         token = {key : value for key, value in zip([field.name for field in dataclasses.fields(AssetToken)], relativePathObj.parts)}
