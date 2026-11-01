@@ -126,7 +126,7 @@ def _loadDataIOClasses(rootDir:Path) -> dict[str, Type[DataIOBase]]:
         raise FileNotFoundError(f'"{rootDir.as_posix()}" is not dir.')
 
     res = {}
-    for filePath in rootDir.iterdir():
+    for filePath in sorted(rootDir.iterdir()):
         if not filePath.is_file():
             continue
 
