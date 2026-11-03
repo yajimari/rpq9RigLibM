@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
+from dataclasses import dataclass, field, fields
+from typing import ClassVar
 
 from PySide6.QtCore import  Qt
 from PySide6.QtWidgets import (
@@ -36,9 +38,53 @@ import maya.api.OpenMaya as om2
 from ..ui import BaseWidget, STRETCH_SIZE_POLICY, FlowLayout, oneUndoWithDeferredDisplayError
 from .dataIO import getDataIOClasses
 from .path import DataPath, AssetToken
+from ..file import ConfigManager
 
 
 RIG_DATA_DIR_KEY = 'RPQ9_RIGLIBM_DATA_PATH'
+
+
+#***************************************
+# Config
+#***************************************
+@dataclass
+class Config:
+    SECTION:ClassVar[str] = 'dataManagerUI'
+    _configManager:ConfigManager = field(default_factory=ConfigManager, init=False)
+    showBuiltin:bool = True 
+
+    def __post_init__(self):
+        if not self._configManager.has_section(Config.SECTION):
+            self._configManager.add_section(Config.SECTION)
+
+        self._loadConfigManagerValue()
+
+
+    def _loadConfigManagerValue(self):
+        for field in fields(self):
+            fieldName = field.name
+            fieldType = field.type
+            currentValue = getattr(self, fieldName)
+
+            if fieldType is int:
+                value = self._configManager.getint(Config.SECTION, fieldName, fallback=currentValue)
+            elif fieldType is float:
+                value = self._configManager.getfloat(Config.SECTION, fieldName, fallback=currentValue)
+            elif fieldType is bool:
+                value = self._configManager.getboolean(Config.SECTION, fieldName, fallback=currentValue)
+            else:
+                value = self._configManager.get(Config.SECTION, fieldName, fallback=currentValue)
+
+            setattr(self, fieldName, value)
+
+
+    def set(self, name, value):
+        self._configManager.set(Config.SECTION, name, str(value))
+        setattr(self, name, value)
+
+
+    def write(self):
+        self._configManager.write()
 
 
 
@@ -141,6 +187,8 @@ class MainUI(BaseWidget):
     def buildUI(self):
         self.setWindowTitle('rpq9 dataManager')
 
+        self.config = Config()
+
         self.dataPath = None
         self.dataIOClasses = {}
 
@@ -170,7 +218,7 @@ class MainUI(BaseWidget):
         self.showBuiltinAction = QAction('Show Builtin',  self)
         dataIOMenu.addAction(self.showBuiltinAction)
         self.showBuiltinAction.setCheckable(True)
-        self.showBuiltinAction.setChecked(True)
+        self.showBuiltinAction.setChecked(self.config.showBuiltin)
         rootLayout.addWidget(self.menuBar)
         #---
 
@@ -233,13 +281,18 @@ class MainUI(BaseWidget):
         self.newAssetAction.triggered.connect(lambda *args: self.showNewAssetDialog())
         self.updateDataDirAction.triggered.connect(lambda *args: self.updateAssets())
 
-        self.reloadDataIOAction.triggered.connect(lambda *args: self.updateDataIOClasses(reload=True, showBuiltin=self.showBuiltinAction.isChecked()))
-        self.showBuiltinAction.toggled.connect(lambda checked: self.updateDataIOClasses(showBuiltin=checked))
+        self.reloadDataIOAction.triggered.connect(lambda *args: self.updateDataIOClasses(reload=True))
+        self.showBuiltinAction.toggled.connect(lambda checked: [self.config.set('showBuiltin', checked), self.updateDataIOClasses()])
 
         self.categoryCombo.currentIndexChanged.connect(lambda *args: self.updateNameCombo())
         self.nameCombo.currentIndexChanged.connect(lambda *args: self.updateTargetCombo())
         
         self.reloadButton.clicked.connect(lambda *args: self.updateAssets())
+
+
+    def closeEvent(self, event):
+        self.config.write()
+        super().closeEvent(event)
 
 
     def updateTargetCombo(self) -> None:
@@ -386,11 +439,11 @@ class MainUI(BaseWidget):
                 break
 
 
-    def updateDataIOClasses(self, reload:bool=False, showBuiltin:bool=True):
+    def updateDataIOClasses(self, reload:bool=False):
         self.dataIOClasses = getDataIOClasses(reload)
         self.dataIOFlowLayout.clear()
 
-        if showBuiltin:
+        if self.config.showBuiltin:
             for name, ioIns in self.dataIOClasses['built_in'].items():
                 if ioIns.isHideGUI():
                     continue
