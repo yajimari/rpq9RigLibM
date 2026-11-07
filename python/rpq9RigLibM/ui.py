@@ -12,11 +12,14 @@ from PySide6.QtWidgets import (
     QWidget,
     QMessageBox,
     QLayout,
-    QSizePolicy
+    QSizePolicy,
+    QVBoxLayout,
+    QListWidget
 )
 
 from shiboken6 import wrapInstance
 
+import maya.cmds as cmds
 import maya.OpenMayaUI as omui
 from maya.app.general.mayaMixin import MayaQWidgetDockableMixin
 from maya.internal.common.utils.ui import UndoContextManager
@@ -156,6 +159,22 @@ class FlowLayout(QLayout):
         return y + lineHeight - rect.y() + bottom
 
 
+
+class SimpleListUI(MayaQWidgetDockableMixin, QWidget):
+    def __init__(self):
+        super().__init__(parent=None)
+        self.setAttribute(Qt.WA_DeleteOnClose)
+        self.buildUI()
+
+    def buildUI(self):
+        rootLayout = QVBoxLayout(self)
+        rootLayout.setContentsMargins(0, 0, 0, 0)
+
+        self.listWidget = QListWidget()
+        rootLayout.addWidget(self.listWidget)
+
+
+
 def getMayaMainWindow() -> QWidget:
     return wrapInstance(int(omui.MQtUtil.mainWindow()), QWidget)
 
@@ -178,6 +197,6 @@ def oneUndoWithDeferredDisplayError(func):
             try:
                 return func(*args, **kwargs)
             except Exception as e:
-                cmds.evalDeferred(f'import maya.api.OpenMata as om2;om2.MGlobal.displayError("{str(e)}")', evaluateNext=True)
+                cmds.evalDeferred(f'import maya.api.OpenMaya as om2;om2.MGlobal.displayError("{str(e)}")', evaluateNext=True)
                 raise
     return wrapper

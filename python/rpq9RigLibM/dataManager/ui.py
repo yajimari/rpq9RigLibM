@@ -34,8 +34,9 @@ from PySide6.QtGui import (
 )
 
 import maya.api.OpenMaya as om2
+from maya.app.general.mayaMixin import MayaQWidgetDockableMixin
 
-from ..ui import BaseWidget, STRETCH_SIZE_POLICY, FlowLayout, oneUndoWithDeferredDisplayError
+from ..ui import BaseWidget, STRETCH_SIZE_POLICY, FlowLayout, SimpleListUI, oneUndoWithDeferredDisplayError
 from .dataIO import getDataIOClasses
 from .path import DataPath, AssetToken
 from ..file import ConfigManager
@@ -417,8 +418,11 @@ class MainUI(BaseWidget):
 
         if selected == showExistingDataAction:
             dataList = ioIns.getListOfExistingData(self.dataPath, self.getAssetToken())
-            for d in dataList:
-                om2.MGlobal.displayInfo(d)
+
+            listUI = SimpleListUI()
+            listUI.setWindowTitle('Existing Data')
+            listUI.listWidget.addItems(dataList)
+            listUI.show()
 
         else:
             for action, func in customMenuData:
